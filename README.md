@@ -95,11 +95,13 @@ Uma aplicação para gerenciamento de eventos, desenvolvida com **Spring Framewo
 
 O usuário pode criar uma conta fornecendo seu  nome de usuário, email, e senha. Após o registro, ele poderá acessar a aplicação e gerenciar seus eventos.
 
-![image](https://github.com/user-attachments/assets/9a2f5d5b-8b22-4c7d-9cfc-c09c064ed020)
+![image](https://github.com/user-attachments/assets/6a98feae-a91d-4eeb-8acc-8de7b0183cc0)
 
 ### Tela de Login
 
 Nesta tela, o usuário realiza o login utilizando seu nome de usuário e senha. Após a autenticação, um token JWT é gerado e enviado ao front-end para garantir o acesso às rotas protegidas da aplicação.
+
+![image](https://github.com/user-attachments/assets/67c3d58d-7f23-4039-a004-248900e677bb)
 
 ### Tela de Listagem de Eventos
 
