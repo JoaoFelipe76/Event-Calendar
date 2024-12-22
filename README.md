@@ -95,7 +95,7 @@ Uma aplicação para gerenciamento de eventos, desenvolvida com **Spring Framewo
 
 O usuário pode criar uma conta fornecendo seu  nome de usuário, email, e senha. Após o registro, ele poderá acessar a aplicação e gerenciar seus eventos.
 
-![image](https://github.com/user-attachments/assets/6a98feae-a91d-4eeb-8acc-8de7b0183cc0)
+![image](https://github.com/user-attachments/assets/264c651f-bc4e-4ec2-8f0f-086b6663afd0)
 
 ### Tela de Login
 
