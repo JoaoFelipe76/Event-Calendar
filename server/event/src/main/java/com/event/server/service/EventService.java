@@ -1,7 +1,9 @@
 package com.event.server.service;
 
 import com.event.server.model.Event;
+import com.event.server.model.User;
 import com.event.server.repository.EventRepository;
+import jakarta.persistence.OptimisticLockException;
 import org.antlr.v4.runtime.misc.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,13 +17,16 @@ public class EventService {
     @Autowired
     private EventRepository eventRepository;
 
-    public List<Event> getAllEvents() {
-        return eventRepository.findAll();
+
+    public List<Event> getEventsByUserLogin(String login) {
+        return eventRepository.findByUserLogin(login);
     }
 
-    public Optional<Event> getEventById(@NotNull Long id) {
-        return eventRepository.findById(id);
+
+    public Optional<Event> getEventByIdAndUser(Long id, String login) {
+        return eventRepository.findByIdAndUserLogin(id, login);
     }
+
 
     public Event saveEvent(@Validated Event event) {
         if (event == null) {
@@ -30,7 +35,8 @@ public class EventService {
         return eventRepository.save(event);
     }
 
-    public void deleteEvent(@NotNull Long id) {
+    // Deletar evento
+    public void deleteEvent(Long id) {
         if (!eventRepository.existsById(id)) {
             throw new IllegalArgumentException("O evento com o ID " + id + " não existe");
         }

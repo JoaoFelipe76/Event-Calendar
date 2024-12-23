@@ -1,6 +1,7 @@
 package com.event.server.controller;
 import com.event.server.model.Event;
 import com.event.server.model.User;
+import com.event.server.repository.UserRepository;
 import com.event.server.service.EventService;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,16 +22,30 @@ public class EventController {
     @Autowired
     private EventService eventService;
 
+    @Autowired
+    private UserRepository userRepository;
+
+
     @GetMapping
     public List<Event> getAllEvents() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserDetails loggedInUser = (UserDetails) authentication.getPrincipal();
 
-        return eventService.getAllEvents();
+        if (authentication != null && authentication.isAuthenticated()) {
 
+            return eventService.getEventsByUserLogin(loggedInUser.getUsername());
+        } else {
+            return (List<Event>) ResponseEntity.status(401).build();
+        }
     }
+
 
     @GetMapping("/{id}")
     public ResponseEntity<Event> getEventById(@PathVariable Long id) {
-        Optional<Event> event = eventService.getEventById(id);
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserDetails loggedInUser = (UserDetails) authentication.getPrincipal();
+
+        Optional<Event> event = eventService.getEventByIdAndUser(id, loggedInUser.getUsername());
         return event.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
@@ -40,65 +55,55 @@ public class EventController {
     public ResponseEntity<Event> createEvent(@RequestBody Event event) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-
         if (authentication != null && authentication.isAuthenticated()) {
             UserDetails loggedInUser = (UserDetails) authentication.getPrincipal();
 
 
-            User user = (User) loggedInUser;
-            event.setUser(user);
+            Optional<User> userOptional = userRepository.findByLogin(loggedInUser.getUsername());
 
+            if (userOptional.isPresent()) {
+                User user = userOptional.get();
+                event.setUser(user);
 
-            if (!event.getUser().getLogin().equals(user.getLogin())) {
-                return ResponseEntity.status(403).build();
+                Event savedEvent = eventService.saveEvent(event);
+                return ResponseEntity.ok(savedEvent);
+            } else {
+                return null;
             }
-
-            Event savedEvent = eventService.saveEvent(event);
-            return ResponseEntity.ok(savedEvent);
         } else {
             return ResponseEntity.status(401).build();
         }
     }
+
 
 
     @Transactional
     @PutMapping("/{id}")
     public ResponseEntity<Event> updateEvent(@PathVariable Long id, @RequestBody Event updatedEvent) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserDetails loggedInUser = (UserDetails) authentication.getPrincipal();
 
-        if (authentication != null && authentication.isAuthenticated()) {
-            UserDetails loggedInUser = (UserDetails) authentication.getPrincipal();
-            User user = (User) loggedInUser;
-
-            Optional<Event> existingEventOptional = eventService.getEventById(id);
-            if (existingEventOptional.isEmpty()) {
-                return ResponseEntity.notFound().build();
-            }
-
-            Event existingEvent = existingEventOptional.get();
-
-
-            if (!existingEvent.getUser().getLogin().equals(user.getLogin())) {
-                return ResponseEntity.status(403).build();
-            }
-
-
-            existingEvent.setText(updatedEvent.getText());
-            existingEvent.setStartDate(updatedEvent.getStartDate());
-            existingEvent.setEndDate(updatedEvent.getEndDate());
-
-
-            Event savedEvent = eventService.saveEvent(existingEvent);
-            return ResponseEntity.ok(savedEvent);
-        } else {
-            return ResponseEntity.status(401).build();
+        Optional<Event> existingEventOptional = eventService.getEventByIdAndUser(id, loggedInUser.getUsername());
+        if (existingEventOptional.isEmpty()) {
+            return ResponseEntity.notFound().build();
         }
+
+        Event existingEvent = existingEventOptional.get();
+        existingEvent.setText(updatedEvent.getText());
+        existingEvent.setStartDate(updatedEvent.getStartDate());
+        existingEvent.setEndDate(updatedEvent.getEndDate());
+
+        Event savedEvent = eventService.saveEvent(existingEvent);
+        return ResponseEntity.ok(savedEvent);
     }
 
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteEvent(@PathVariable Long id) {
-        Optional<Event> event = eventService.getEventById(id);
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserDetails loggedInUser = (UserDetails) authentication.getPrincipal();
+
+        Optional<Event> event = eventService.getEventByIdAndUser(id, loggedInUser.getUsername());
         if (event.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
@@ -106,5 +111,4 @@ public class EventController {
         eventService.deleteEvent(id);
         return ResponseEntity.noContent().build();
     }
-
 }
