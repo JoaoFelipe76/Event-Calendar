@@ -60,6 +60,13 @@ export class SchedulerComponent implements OnInit {
   }
 
   saveEvent(event: any) {
+
+    const isDuplicate = this.checkForDuplicateEvent(event);
+    if (isDuplicate) {
+      alert('Este evento já existe no mesmo intervalo de tempo.');
+      return;
+    }
+
     const newEvent: Partial<Event> = {
       startDate: event.start_date.toISOString(),
       endDate: event.end_date.toISOString(),
@@ -74,7 +81,6 @@ export class SchedulerComponent implements OnInit {
       (error) => {
         console.error('Erro ao criar evento', error);
 
-
         if (error.status === 403) {
           alert('Você não tem permissão para criar este evento. Verifique suas permissões ou entre em contato com o administrador.');
         } else {
@@ -84,7 +90,16 @@ export class SchedulerComponent implements OnInit {
         scheduler.deleteEvent(event.id);
       }
     );
-}
+  }
+
+
+  checkForDuplicateEvent(event: any): boolean {
+
+    const existingEvents = scheduler.getEvents();
+    return existingEvents.some((existingEvent: any) =>
+      existingEvent.startDate === event.start_date && existingEvent.endDate === event.end_date);
+  }
+
 
   updateEvent(event: any) {
     const updatedEvent: Partial<Event> = {
