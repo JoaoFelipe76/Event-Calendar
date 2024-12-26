@@ -35,7 +35,7 @@ public class EventService {
         return eventRepository.save(event);
     }
 
-    // Deletar evento
+   
     public void deleteEvent(Long id) {
         if (!eventRepository.existsById(id)) {
             throw new IllegalArgumentException("O evento com o ID " + id + " não existe");
