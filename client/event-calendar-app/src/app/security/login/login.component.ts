@@ -31,7 +31,7 @@ export class LoginComponent {
 
   public criarFormLogin(): FormGroup {
     return this.fb.group({
-      login: ["", [Validators.required, Validators.minLength(6)]], // Atualizado de 'username' para 'login'
+      login: ["", [Validators.required, Validators.minLength(6)]], 
       password: ["", [Validators.required, Validators.minLength(6)]]
     });
   }
