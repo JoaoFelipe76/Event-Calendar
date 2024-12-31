@@ -111,7 +111,7 @@ Na tela principal, o usuário pode visualizar todos os eventos criados. A interf
 - **Visualização por dia, semana ou mês**: O usuário pode alternar entre essas visões para encontrar o evento desejado mais rapidamente.
 - **Eventos com duração superior a um dia**: Eventos que duram mais de um dia são destacados visualmente para fácil identificação.
 
-![image](https://github.com/user-attachments/assets/14100cf6-8f51-470c-869f-80e41cbfd844)
+![image](https://github.com/user-attachments/assets/fc2ec316-bcfc-4757-9d22-70ce01fccbb4)
 
 
 ### Adicionar Novo Evento
